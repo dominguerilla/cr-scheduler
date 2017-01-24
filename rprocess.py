@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Preprocesses the reports from Zed, so that we can get it ready for use for the scheduler
 # 1. Renames the title rows in the input csv
 #   Day Of Week -> weekday
@@ -35,7 +34,6 @@ def processreport(filename, newfilename):
 
         # remove the rest of the unnecessary rows from the file
         for row in reader:
-<<<<<<< HEAD
             writer.writerow((row[0], row[1], row[4], row[5]))
 
 # Returns a list of Shift objects based on an individual report created by processreport
