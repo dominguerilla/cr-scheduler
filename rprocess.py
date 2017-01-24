@@ -4,21 +4,7 @@
 # 2. Removes the Requests, Location, Total Requests, and Total Hours column
 # And can turn each row of the preprocessed report into an object for use in the scheduler
 import csv
-
-# Represents a single shift in Zed. 
-# You can use 'print([shift variable])' to print out a handy representation of that individual shift.
-class Shift:
-
-    # 'row' should be a list of strings. Meant to be used in conjunction with the default python csv.reader object.
-    def __init__(self, row):
-        self.netID = row[0]
-        self.location = row[1]
-        self.start = row[2]
-        self.end = row[3]
-    
-    def __str__(self):
-        return self.netID + "," + self.location + "," + self.start + "," + self.end
-
+import cr
 
 # Renames the columns, as well as removes the last three unnecessary rows from the report (requests, total requests, and total hours)
 def processreport(filename, newfilename):
