@@ -37,7 +37,7 @@ def loadshifts(filename):
 
         # each row in reader is a list of strings
         for row in reader:
-            shift = Shift(row)
+            shift = cr.Shift(row)
             shifts.append(shift)
     return shifts
 

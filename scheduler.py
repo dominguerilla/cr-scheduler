@@ -6,12 +6,14 @@ def detectoverlap(allshifts):
 
     # list of cons(netid, {sups that overlap}) objects
     overlaplist = {}
+
     # populate it with list of cons from listCons
-
-
+    # grab the unique netIDS from the cons shift list
+    # return a list of {consNetID, {}}
     populate(overlaplist, conslist) #PSEUDO
 
-    if cons[i].start <= sups[j].end && cons[i].end >= sups[j].start:
+
+    if cons[i].start <= sups[j].end and cons[i].end >= sups[j].start:
         # find cons netid in overlaplist
         k = 0
         while overlaplist[k].netid != cons[i].netid:
@@ -34,3 +36,12 @@ def assignshift(overlaplist):
 
 
     return
+
+# Returns a list of unique netIDs from a given shift list 
+#   -- knt35
+def getuniquenetids(shiftlist):
+    netids = []
+    for shift in shiftlist:
+        if not shift.netID in netids:
+            netids.append(shift.netID)
+    return netids
