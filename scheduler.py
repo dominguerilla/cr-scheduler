@@ -22,8 +22,8 @@ def detectoverlap(allshifts):
     # PSEUDOCODE END
 
     for conshift in cons:
-        # get the tuple from the consoverlaps list with the netid of this cons 
-        constuple = [c for c in consoverlaps if c[0] == conshift.netID]
+        # get the tuple from the consoverlaps list with the netid of this cons
+        constuple = [c for c in consoverlaps if c[0] == conshift.netID][0]
         for supshift in sups:
             # If the cons shift overlaps with the sup shift....
             if conshift.start <= supshift.end and conshift.end >= supshift.start:
