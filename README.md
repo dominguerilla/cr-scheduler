@@ -10,3 +10,5 @@ populates the assigned cons netids list by iterating through the rprocess
 cons object list. if any cons are unassigned after iterating through, they
 are collected in an unassigned list and must be manually scheduled.
 
+CURRENTLY:
+There is something wrong with scheduler.detectoverlap() -- maybe a logic issue or something with my python syntax. I shall look into it my next shift.
