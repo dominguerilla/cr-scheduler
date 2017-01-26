@@ -5,14 +5,11 @@ def detectoverlap(allshifts):
     sups, cons = allshifts
 
     # list of cons(netid, {sups that overlap}) objects
-    overlaplist = {}
+    consoverlaps = createtuplelist(cons)
+    supassignment = createtuplelist(sups)
 
-    # populate it with list of cons from listCons
-    # grab the unique netIDS from the cons shift list
-    # return a list of {consNetID, {}}
-    populate(overlaplist, conslist) #PSEUDO
-
-
+    # Checking for the actual overlaps
+    # PSEUDOCODE START
     if cons[i].start <= sups[j].end and cons[i].end >= sups[j].start:
         # find cons netid in overlaplist
         k = 0
@@ -22,7 +19,8 @@ def detectoverlap(allshifts):
         overlaplist[k].suplist = sups[j].netid
 
     # sort list in ascending order of number of sups in cons suplist
-    sort(overlaplist, len(overlaplist.suplist)) #PSEUDO
+    sort(overlaplist, len(overlaplist.suplist)) 
+    # PSEUDOCODE END
 
     return overlaplist
 
@@ -30,18 +28,13 @@ def detectoverlap(allshifts):
 def assignshift(overlaplist):
     # import text file containing all sups
     suplist = []
-
-    suplist
-
-
-
     return
 
-# Returns a list of unique netIDs from a given shift list 
-#   -- knt35
-def getuniquenetids(shiftlist):
+# Given an input list of Shift objects,
+# returns a list of unique tuples <netid, []>
+def createtuplelist(shiftlist):
     netids = []
     for shift in shiftlist:
         if not shift.netID in netids:
-            netids.append(shift.netID)
+            netids.append((shift.netID, []))
     return netids
