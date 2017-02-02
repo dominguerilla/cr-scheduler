@@ -4,13 +4,13 @@ import heapq
 # Detects overlapping shifts between consultants and supervisors
 # Returns a tuple containing 
 # 1. a heap of cons objects that contain: (netid of cons, [list of sups that overlap at some point])
-# 2. a heap of sup assignment objects: (netid of sup, [list of cons that are assigned to this sups])
+# 2. a list of sup assignment objects: (netid of sup, [list of cons that are assigned to this sups])
 def populateoverlapshift(allshifts):
     sups, cons = allshifts
 
     # list of cons(netid, {sups that overlap}) objects
     consoverlaps = createshiftassignments(cons)
-    supassignments = createshiftassignments(sups)
+    supassignments = createshiftassignments(sups, maxassignments = 8)
 
     # populating consoverlaps with the sup netIDs that overlap with their shifts
     for conshift in cons:
@@ -21,16 +21,15 @@ def populateoverlapshift(allshifts):
             if conshift.overlaps(supshift):
                 consassign.addassignment(supshift.netID)
     heapq.heapify(consoverlaps)
-    heapq.heapify(supassignments)
     return (supassignments, consoverlaps)
 
 # Given an input list of Shift objects,
 # returns a list of unique ShiftAssignment objects
-def createshiftassignments(shiftlist):
+def createshiftassignments(shiftlist, maxassignments = 0):
     tuplelist = []
     for shift in shiftlist:
         if not shift.netID in [t.netID for t in tuplelist]:
-            tuplelist.append(ShiftAssignment(shift.netID))
+            tuplelist.append(ShiftAssignment(shift.netID, maxassignments = maxassignments))
     return tuplelist
 
 # This not necessary, since we can populate the list of sups from populateoverlapshift()
