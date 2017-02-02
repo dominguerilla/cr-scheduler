@@ -5,8 +5,8 @@ Given a list of shifts including ID and start/end times for supervisors and cons
 *rprocess.py*
 Performs data-related operations on shift information from Zed, including:
 
-*Report preprocessing (removing unnecessary columns, renaming some columns)
-*Loads the preprocessed reports into memory
+* Report preprocessing (removing unnecessary columns, renaming some columns)
+* Loads the preprocessed reports into memory
 
 *cr.py*
 Contains class definitions necessary for the scheduling algorithm.
