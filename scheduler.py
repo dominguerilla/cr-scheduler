@@ -1,9 +1,8 @@
 from cr import ShiftAssignment
-import heapq
 
 # Detects overlapping shifts between consultants and supervisors
 # Returns a tuple containing 
-# 1. a HEAP of cons objects that contain: (netid of cons, [list of sups that overlap at some point])
+# 1. a LIST of cons objects that contain: (netid of cons, [list of sups that overlap at some point])
 # 2. a LIST of sup assignment objects: (netid of sup, [list of cons that are assigned to this sups])
 def populateoverlapshift(allshifts):
     sups, cons = allshifts
@@ -20,7 +19,6 @@ def populateoverlapshift(allshifts):
             # If the cons shift overlaps with the sup shift
             if conshift.overlaps(supshift):
                 consassign.addassignment(supshift.netID)
-    heapq.heapify(consoverlaps)
     return (supassignments, consoverlaps)
 
 # Given an input list of Shift objects,

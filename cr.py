@@ -1,6 +1,5 @@
 # Holds all data structures we use for CR scheduling.
 from datetime import datetime
-import heapq
 
 # Represents a single shift in Zed.
 # You can use 'print([shift variable])' to print out a handy representation

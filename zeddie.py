@@ -1,6 +1,5 @@
 import scheduler
 import rprocess
-import cr
 import heapq
 import sys
 
@@ -35,6 +34,10 @@ def assigncrs(supreport, consreport):
     # of assignments, it's removed from possibleassign.
     # consoverlaps is just the priority queue (heap) of consultants, sorted by the number of sups they have overlapping shifts with.
     possibleassign, consoverlaps = scheduler.populateoverlapshift(allshifts)
+
+    # Turn consoverlaps into a priority queue/heap
+    # This way, the consultants with the least amount of overlapping sups are prioritized
+    heapq.heapify(consoverlaps)
 
     # The suggested CR assignments that will be returned once this function finishes.
     supassignments = list(possibleassign)
