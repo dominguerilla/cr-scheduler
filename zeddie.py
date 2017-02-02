@@ -2,10 +2,12 @@ import scheduler
 import rprocess
 import cr
 import heapq
+import sys
 
-# Returns a sup ShiftAssignment for the next available sup for the given ShiftAssignment ascons.
+# Returns a sup ShiftAssignment for the next available sup in possibleassign for the given ShiftAssignment ascons.
 # Returns None if ascons does not have any overlapping sups
-def selectnextsup(ascons):
+# If this finds that a 'popped' sup has the max assignments, it will remove it from the consoverlaps heap
+def selectnextsup(ascons, possibleassign, consoverlaps):
     # if this cons has no overlaps
     if len(ascons.assignments) == 0:
         return None
@@ -23,32 +25,61 @@ def selectnextsup(ascons):
         else:
             return sup
 
-allshifts = rprocess.loadreports('data/sups.csv', 'data/cons.csv')
-possibleassign, consoverlaps = scheduler.populateoverlapshift(allshifts)
+# Assigns consultants to supervisors for their CRs, based on the given sup shift report data and cons report data.
+# These reports should have been already processed by rprocess.processcsv().
+# Returns a tuple containing 1. the assignments of cons to sups and 2. the list of unassigned consultant netIDs
+def assigncrs(supreport, consreport):
+    allshifts = rprocess.loadreports(supreport, consreport)
 
-# The sup-cons assignments
-supassignments = list(possibleassign)
+    # possibleassign is the list of sups that CAN have more consultants scheduled for. Once the sup reaches the max number
+    # of assignments, it's removed from possibleassign.
+    # consoverlaps is just the priority queue (heap) of consultants, sorted by the number of sups they have overlapping shifts with.
+    possibleassign, consoverlaps = scheduler.populateoverlapshift(allshifts)
 
-# Populate the unassignedcons list
-unassignedcons = []
-for c in consoverlaps:
-    unassignedcons.append(c.netID)
+    # The suggested CR assignments that will be returned once this function finishes.
+    supassignments = list(possibleassign)
 
-print "len(consoverlaps): " + str(len(consoverlaps))
-while len(consoverlaps) > 0:
-    # selectNextCons()
-    ascons = heapq.heappop(consoverlaps)
+    # Populate the unassignedcons list.
+    # As a consultant is assigned a supervisor, they are removed from unassignedcons. However, if a consultant does not
+    # have any overlapping shifts with any sup, their netIDs remain in this list.
+    unassignedcons = []
+    for c in consoverlaps:
+        unassignedcons.append(c.netID)
+
+    # Loop while there are still consultants that have overlapping shifts with sups
+    while len(consoverlaps) > 0:
+        # selectNextCons()
+        nextcons = heapq.heappop(consoverlaps)
+        
+        # find the ShiftAssignment object that corresponds to the FIRST sup on ascons
+        # aka selectNextSup()
+        nextsup = selectnextsup(nextcons, possibleassign, consoverlaps)
+
+        if nextsup == None:
+            continue
+        
+        # The next supervisor was selected successfully; record the assignment and remove the cons from unassigned cons
+        nextsup.addassignment(nextcons.netID)
+        unassignedcons.remove(nextcons.netID)
+    return (supassignments, unassignedcons)
     
-    # find the ShiftAssignment object that corresponds to the FIRST sup on ascons
-    # aka selectNextSup()
-    assup = selectnextsup(ascons)
 
-    if assup == None:
-        continue
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        supreport = sys.argv[1]
+        consreport = sys.argv[2]
+    elif len(sys.argv) == 1:
+        supreport = 'data/sups.csv'
+        consreport = 'data/cons.csv'
+    else:
+        print "Usage: python zeddie.py [sup report] [cons report]"
+        print "OR python zeddie.py (defaults above to 'data/sups.csv' and 'data/cons.csv')"
+        print "[sup report] = A ZED report containing all of the supervisors' shifts in csv format, which has ALREADY been processed by rprocess.py"
+        print "[cons report] = A ZED report containing all of the consultants' shifts in csv format, which has ALREADY been processed by rprocess.py"
+        sys.exit()
+    assignments, unassigned = assigncrs(supreport, consreport)
 
-    assup.addassignment(ascons.netID)
-    unassignedcons.remove(ascons.netID)
-
-for a in supassignments:
-    print a
-print "Unassigned cons: " + str(unassignedcons)
+    # Print out results
+    for a in assignments:
+        print a
+    print "Unassigned cons: " + str(unassigned)

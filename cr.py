@@ -1,4 +1,4 @@
-# Holds the data structures we use for CR scheduling.
+# Holds all data structures we use for CR scheduling.
 from datetime import datetime
 import heapq
 
@@ -23,16 +23,23 @@ class Shift:
             return True
         return False
 
-# Meant to be a smarter version of the tuple <netID, []>
+# Meant to be a smarter version of the tuple <netID, []>.
+# Used in zeddie and scheduler to:
+#   1. Track the sups that each cons has an overlapping shift with
+#   2. Track the sups that each cons is assigned to
 class ShiftAssignment:
     
+    # netID = the netID of the assignment to use. 
+    # maxassignments = the max number of assignments to allow this ShiftAssignment to have.
     def __init__(self, netID, maxassignments = 0):
         self.netID = netID
         self.assignments = []
-        # if maxassignments = 0, then there is no max assignment limit
+        # if maxassignments is 0, then there is no max assignment limit
         self.maxassignments = maxassignments
 
-    # Adds a netID to the assignments field. Returns true if the length of the list of assignments is less than maxassignments or if netID is already in the assignments list, false if at max 
+    # Adds a netID to the assignments field. 
+    # Returns true if the length of the list of assignments is less than maxassignments 
+    # or if netID is already in the assignments list, false if at max 
     def addassignment(self, netID):
         if not netID in self.assignments:
             self.assignments.append(netID)
@@ -42,6 +49,7 @@ class ShiftAssignment:
                 return False
         return True
     
+    # Removes a netID from this ShiftAssignment's assignments, if it exists
     def removeassignment(self, netID):
         if netID in self.assignments:
             self.assignments.remove(netID)
@@ -53,6 +61,7 @@ class ShiftAssignment:
         return (not self.maxassignments == 0) and len(self.assignments) >= self.maxassignments
 
     # A ShiftAssignment is 'less' than another if it has less assignments than the other.
+    # This is defined so that a list of ShiftAssignments works with heapq
     def __lt__(self, other):
         return len(self.assignments) < len(other.assignments)
     

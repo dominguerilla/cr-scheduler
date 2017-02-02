@@ -1,4 +1,4 @@
-# Preprocesses the reports from Zed, so that we can get it ready for use for
+# REPORT PROCESS: Preprocesses the reports from Zed, so that we can get it ready for use for
 # the scheduler
 # 1. Renames the title rows in the input csv
 #   Day Of Week -> weekday
@@ -10,7 +10,7 @@ import cr
 
 # Renames the columns, as well as removes the last three unnecessary rows from
 # the report (requests, total requests, and total hours)
-def processreport(filename, newfilename):
+def processcsv(filename, newfilename):
     with open(filename, "r") as csvFile, open(newfilename, "w") as newFile:
         reader = csv.reader(csvFile)
         writer = csv.writer(newFile)
@@ -26,7 +26,7 @@ def processreport(filename, newfilename):
             writer.writerow((row[0], row[1], row[4], row[5]))
 
 # Returns a list of Shift objects based on an individual report created by
-# processreport
+# processcsv
 def loadshifts(filename):
     shifts = []
     with open(filename, 'r') as report:
@@ -42,7 +42,7 @@ def loadshifts(filename):
     return shifts
 
 # Returns a tuple of two lists of Shift objects based on reports that has been
-# processed by processreport()
+# processed by processcsv()
 # 'supreport' should be the report that comes out after processing the shifts
 # of sups
 # 'consreport' should be the report that comes out after processing the shifts
