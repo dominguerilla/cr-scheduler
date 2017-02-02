@@ -7,6 +7,7 @@
 # the scheduler
 import csv
 import cr
+import sys
 
 # Renames the columns, as well as removes the last three unnecessary rows from
 # the report (requests, total requests, and total hours)
@@ -57,3 +58,14 @@ def loadreports(supreport, consreport):
     sups = loadshifts(supreport)
     cons = loadshifts(consreport)
     return (sups, cons)
+
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        processcsv(sys.argv[1], 'data/sups.csv')
+        processcsv(sys.argv[2], 'data/cons.csv')
+        print "Reports processed to data/sups.csv and data/cons.csv."
+        sys.exit()
+    else:
+        print "Usage: python rprocess.py [SUP SHIFTS REPORT] [CONS SHIFTS REPORT]"
+        print "Will process the input files into data/sups.csv and data/cons.csv, respectively."
+        print "The reports should be downloaded directly from Zed."
