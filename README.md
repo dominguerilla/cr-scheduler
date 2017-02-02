@@ -18,9 +18,11 @@ Consultants with a lesser number of overlapping shifts with supervisors are prio
 **Works only with Python 2.X**
 
 First, download two separate reports from Zed; one being the shifts for supervisors for the given period, and another being the shifts for consultants in the same period.
+
 `python rprocess.py [sup report] [cons report]`
 
 Next, run Zeddie using the two generated reports (by default, should be 'data/sups.csv' and 'data/cons.csv') as input:
+
 `python zeddie.py [sup report] [cons report]`
 
 Zeddie should print out both the assignments for each supervisor, as well as the list of consultants who were not able to be assigned to a supervisor (because they did not have any overlapping shifts).
