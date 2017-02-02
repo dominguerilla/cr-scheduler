@@ -16,6 +16,7 @@ Consultants with a lesser number of overlapping shifts with supervisors are prio
 
 ##Usage##
 **Works only with Python 2.X**
+
 First, download two separate reports from Zed; one being the shifts for supervisors for the given period, and another being the shifts for consultants in the same period.
 `python rprocess.py [sup report] [cons report]`
 
