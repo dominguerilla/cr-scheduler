@@ -17,9 +17,18 @@ class Shift:
     def __str__(self):
         return self.netID + "," + self.location + "," + self.start + "," + self.end
 
+    # http://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
+    # Will return True if the shift times overlap AND the overlap time is greater than or equal to 30 minutes
     def overlaps(self, shiftB):
         if self.start <= shiftB.end and self.end >= shiftB.end:
-            return True
+            latest_start = max(self.start, shiftB.start)
+            earliest_end = min(self.end, shiftB.end)
+            overlaptime = (earliest_end - latest_start).seconds + 1
+
+            # Get the minutes of overlap
+            minuteoverlap = overlaptime // 60 % 60
+            if minuteoverlap >= 30:
+                return True
         return False
 
 # Meant to be a smarter version of the tuple <netID, []>.
