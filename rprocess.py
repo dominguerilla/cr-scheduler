@@ -8,6 +8,7 @@
 import csv
 import cr
 import sys
+import os
 
 # Renames the columns, as well as removes the last three unnecessary rows from
 # the report (requests, total requests, and total hours)
@@ -61,6 +62,8 @@ def loadreports(supreport, consreport):
 
 if __name__ == "__main__":
     if len(sys.argv) == 3:
+        if not os.path.exists('data/'):
+            os.makedirs('data/')
         processcsv(sys.argv[1], 'data/sups.csv')
         processcsv(sys.argv[2], 'data/cons.csv')
         print "Reports processed to data/sups.csv and data/cons.csv."

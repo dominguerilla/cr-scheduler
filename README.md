@@ -1,14 +1,22 @@
 #Consultant Review Scheduler#
 
-*rprocess.py :* preprocesser, takes report from zed and strips it of 
-unnecessary information. spits out a list of cons objects that contain:
-cons(netid, {list of sup netids that they overlap with})
+*rprocess.py*
+Performs data-related operations on shift information from Zed, including:
+    - Report preprocessing (removing unnecessary columns, renaming some columns)
+    - Loads the preprocessed reports into memory
 
-*scheduler.py :* the actual scheduler. sub object contains:
-sup(netid, {list of cons netids that overlap}, [assigned cons netids])
-populates the assigned cons netids list by iterating through the rprocess
-cons object list. if any cons are unassigned after iterating through, they
-are collected in an unassigned list and must be manually scheduled.
+*cr.py*
+Contains class definitions necessary for the scheduling algorithm.
 
-CURRENTLY:
-There is something wrong with scheduler.detectoverlap() -- maybe a logic issue or something with my python syntax. I shall look into it my next shift.
+*zeddie.py* 
+Where the bulk of the scheduling algorithm takes place, leveraging data structures from cr.py and reports loaded from rprocess.py.
+Consultants with a lesser number of overlapping shifts with supervisors are prioritized.
+
+##Usage##
+First, download two separate reports from Zed; one being the shifts for supervisors for the given period, and another being the shifts for consultants in the same period.
+`python rprocess.py [sup report] [cons report]`
+
+Next, run Zeddie using the two generated reports (by default, should be 'data/sups.csv' and 'data/cons.csv') as input:
+`python zeddie.py [sup report] [cons report]`
+
+Zeddie should print out both the assignments for each supervisor, as well as the list of consultants who were not able to be assigned to a supervisor (because they did not have any overlapping shifts).
