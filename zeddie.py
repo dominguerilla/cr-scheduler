@@ -1,3 +1,12 @@
+# Main scheduling module for the CR-scheduler.
+# If you'd like to change how selectNextCons() or selectNextSup() works, just change initializecons() and initializesups(), as well as
+# selectnextcons() and selectnextsup().
+# The current implementation uses a priority queue for getting the next consultant based on the number of supervisors they work with, 
+# and just grabbing a supervisor from that consultant's list.
+#
+# Another possible implementation would be the reverse; get the next supervisor based on the number of unique consultants they work with,
+# and then assigning them a consultant from their list.
+
 import rprocess
 import heapq
 import sys
@@ -34,6 +43,10 @@ def createshiftassignments(shiftlist, maxassignments = 0):
             tuplelist.append(ShiftAssignment(shift.netID, maxassignments = maxassignments))
     return tuplelist
 
+# Initializes the possibleassign list, 
+def initializesups(possibleassign):
+    return possibleassign
+
 # Returns a sup ShiftAssignment for the next available sup in possibleassign for the given ShiftAssignment ascons.
 # Returns None if ascons does not have any overlapping sups
 # If this finds that a 'popped' sup has the max assignments, it will remove it from the consoverlaps heap
@@ -55,6 +68,18 @@ def selectnextsup(ascons, possibleassign, consoverlaps):
         else:
             return sup
 
+# Initializes the cons-sup overlap list.
+# This should be run at least once before using selectnextcons().
+# Current implementation is to turn it into a priority queue
+# This way, the consultants with the least amount of overlapping sups are prioritized
+def initializecons(consoverlaps):
+    return heapq.heapify(consoverlaps)
+
+# Gets the next cons to assign a supervisor to
+# Current implementation is to pop it from a priority queue.
+def selectnextcons(consoverlaps):
+    return heapq.heappop(consoverlaps)
+
 # Assigns consultants to supervisors for their CRs, based on the given sup shift report data and cons report data.
 # These reports should have been already processed by rprocess.processcsv().
 # Returns a tuple containing 1. the assignments of cons to sups and 2. the list of unassigned consultant netIDs
@@ -67,8 +92,8 @@ def assigncrs(supreport, consreport):
     possibleassign, consoverlaps = populateoverlapshift(allshifts)
 
     # Turn consoverlaps into a priority queue/heap
-    # This way, the consultants with the least amount of overlapping sups are prioritized
-    heapq.heapify(consoverlaps)
+    consoverlaps = initializecons(consoverlaps)
+    possibleassign = initialize(possibleassign)
 
     # The suggested CR assignments that will be returned once this function finishes.
     supassignments = list(possibleassign)
@@ -83,9 +108,8 @@ def assigncrs(supreport, consreport):
     # Loop while there are still consultants that have overlapping shifts with sups
     while len(consoverlaps) > 0:
         # selectNextCons()
-        nextcons = heapq.heappop(consoverlaps)
+        nextcons = selectnextcons(consoverlaps)
         
-        # find the ShiftAssignment object that corresponds to the FIRST sup on ascons
         # aka selectNextSup()
         nextsup = selectnextsup(nextcons, possibleassign, consoverlaps)
 

@@ -11,8 +11,9 @@ import sys
 import os
 
 # Renames the columns, as well as removes the last three unnecessary rows from
-# the report (requests, total requests, and total hours)
-def processcsv(filename, newfilename):
+# the report (requests, total requests, and total hours). If a list of netIDs is specified,
+# will create a report containing only the requested netID's shifts.
+def processcsv(filename, newfilename, netIDs = None):
     with open(filename, "r") as csvFile, open(newfilename, "w") as newFile:
         reader = csv.reader(csvFile)
         writer = csv.writer(newFile)
@@ -24,11 +25,16 @@ def processcsv(filename, newfilename):
         writer.writerow(("netID", "location", "start", "end"))
 
         # remove the rest of the unnecessary rows from the file
-        for row in reader:
-            writer.writerow((row[0], row[1], row[4], row[5]))
+        if netIDs == None:
+            for row in reader:
+                writer.writerow((row[0], row[1], row[4], row[5]))
+        else:
+            for row in reader:
+                if row[0] in netIDs:
+                    writer.writerow((row[0], row[1], row[4], row[5]))
 
 # Returns a list of Shift objects based on an individual report created by
-# processcsv
+# processcsv.
 def loadshifts(filename):
     shifts = []
     with open(filename, 'r') as report:
