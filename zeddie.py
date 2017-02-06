@@ -21,7 +21,7 @@ def populateoverlapshift(allshifts):
 
     # list of cons(netid, {sups that overlap}) objects
     consoverlaps = createshiftassignments(cons)
-    supassignments = createshiftassignments(sups, maxassignments = 8)
+    supassignments = createshiftassignments(sups, maxassignments = 10)
 
     # populating consoverlaps with the sup netIDs that overlap with their shifts
     for conshift in cons:
@@ -47,6 +47,9 @@ def createshiftassignments(shiftlist, maxassignments = 0):
 # Call this AFTER calling rprocess.loadreports().
 def loadsavedassignments(filename, possibleassign, consoverlaps):
     manualassignments = rprocess.loadassignments(filename)
+    if manualassignments == None:
+        print "No manual assignments found."
+        return
     for assignment in manualassignments:
         matching = [m for m in possibleassign if assignment.netID == m.netID]
         # if this sup has not been manually assigned
@@ -58,10 +61,8 @@ def loadsavedassignments(filename, possibleassign, consoverlaps):
         possibleassign.append(assignment)
 
         # Removing cons overlap from consoverlap
-        for cons in matching[0].assignments:
+        for cons in assignment.assignments:
             co = [c for c in consoverlaps if c.netID == cons]
-            if not co:
-                continue
             consoverlaps.remove(co[0])
     
 
@@ -114,6 +115,8 @@ def assigncrs(supreport, consreport):
     # of assignments, it's removed from possibleassign.
     # consoverlaps is just the priority queue (heap) of consultants, sorted by the number of sups they have overlapping shifts with.
     possibleassign, consoverlaps = populateoverlapshift(allshifts)
+    unassignedcons = []
+    loadsavedassignments('data/manualassign.csv', possibleassign, consoverlaps)
 
     # Turn consoverlaps into a priority queue/heap
     initializecons(consoverlaps)
@@ -125,7 +128,6 @@ def assigncrs(supreport, consreport):
     # Populate the unassignedcons list.
     # As a consultant is assigned a supervisor, they are removed from unassignedcons. However, if a consultant does not
     # have any overlapping shifts with any sup, their netIDs remain in this list.
-    unassignedcons = []
     for c in consoverlaps:
         unassignedcons.append(c.netID)
 

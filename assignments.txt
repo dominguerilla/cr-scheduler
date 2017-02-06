@@ -1,0 +1,9 @@
+{ nm542, ['dfd43', 'dmd349', 'hah70', 'psc66', 'jy415', 'bdh60', 'mma206', 'evp14', 'nrs100', 'aas281'] }
+{ mv378, ['adb185', 'dhl45', 'tje42', 'ny76', 'ajh223', 'aom18', 'sbc90', 'alg163', 'ogb4', 'rbp64', 'tmc202'] }
+{ rlf92, ['pkp63', 'knt35', 'jmo185', 'bnd21', 'lcn16', 'hpp33', 'mi159', 'rc864', 'ls949', 'trc86', 'yk390'] }
+{ amk276, ['jc2004', 'elh83', 'jb1339', 'ec681', 'cpr75', 'pm521', 'aee51', 'sn453', 'yl843', 'cws66'] }
+{ mp1202, ['sm1574', 'dc816', 'sa1110', 'am1505', 'dtc77', 'lhw33', 'wowchoi', 'kad326', 'bah123', 'dja145', 'cds167'] }
+{ cmd363, ['bcs109', 'ety6', 'ab1395', 'rep100', 'kak336', 'ncc56', 'ij38'] }
+{ freematt, ['cso29', 'et247', 'kt306', 'arh94', 'ak1024', 'cjk171', 'ks781', 'ebb43'] }
+{ ps635, ['ak1024', 'ajh223', 'da392', 'knt35', 'mwa27', 'dmd349', 'dfd43', 'ab1395'] }
+Unassigned cons: ['aza12', 'ry137', 'nd292', 'knp69', 'js1691', 'dfr49', 'jvw31', 'da392', 'ns812', 'mwa27']
