@@ -12,8 +12,9 @@ import os
 
 # Renames the columns, as well as removes the last three unnecessary rows from
 # the report (requests, total requests, and total hours). If a list of netIDs is specified,
-# will create a report containing only the requested netID's shifts.
-def processcsv(filename, newfilename, netIDs = None):
+# will create a report containing only the requested netID's shifts. If a list of locations 
+# is specified, it will also only write those given locations.
+def processcsv(filename, newfilename, netIDs = None, locations = None):
     with open(filename, "r") as csvFile, open(newfilename, "w") as newFile:
         reader = csv.reader(csvFile)
         writer = csv.writer(newFile)
@@ -25,13 +26,22 @@ def processcsv(filename, newfilename, netIDs = None):
         writer.writerow(("netID", "location", "start", "end"))
 
         # remove the rest of the unnecessary rows from the file
+        # IS THERE A BETTER WAY TO DO THIS GOD
         if netIDs == None:
             for row in reader:
-                writer.writerow((row[0], row[1], row[4], row[5]))
+                if locations == None:
+                    writer.writerow((row[0], row[1], row[4], row[5]))
+                else:
+                    if row[1] in locations:
+                        writer.writerow((row[0], row[1], row[4], row[5]))
         else:
             for row in reader:
                 if row[0] in netIDs:
-                    writer.writerow((row[0], row[1], row[4], row[5]))
+                    if locations == None:
+                        writer.writerow((row[0], row[1], row[4], row[5]))
+                    else:
+                        if row[1] in locations:
+                            writer.writerow((row[0], row[1], row[4], row[5]))
 
 # Returns a list of Shift objects based on an individual report created by
 # processcsv.
@@ -48,6 +58,20 @@ def loadshifts(filename):
             shift = cr.Shift(row)
             shifts.append(shift)
     return shifts
+
+# Loads a list of manually assigned sups and consultants from a CSV file.
+# This CSV should be in the format of supnetID, cons netid1, consnetid2, .... on each line.
+def loadassignments(filename):
+    assignments = []
+    if not os.path.isfile(filename):
+        return None
+    with open(filename, 'r') as report:
+        reader = csv.reader(report)
+        for row in reader:
+            netID = row.pop(0)
+            cons = row
+            assignments.append( cr.ShiftAssignment(netID, assignments = cons, maxassignments = 8) )
+    return assignments
 
 # Returns a tuple of two lists of Shift objects based on reports that has been
 # processed by processcsv()

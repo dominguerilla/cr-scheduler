@@ -40,8 +40,30 @@ def createshiftassignments(shiftlist, maxassignments = 0):
     tuplelist = []
     for shift in shiftlist:
         if not shift.netID in [t.netID for t in tuplelist]:
-            tuplelist.append(ShiftAssignment(shift.netID, maxassignments = maxassignments))
+            tuplelist.append(ShiftAssignment(shift.netID, assignments = [], maxassignments = maxassignments))
     return tuplelist
+
+# Loads saved assignments from file, and then removes assignments that have already existed from both the sup assignments list and the consoverlap list.
+# Call this AFTER calling rprocess.loadreports().
+def loadsavedassignments(filename, possibleassign, consoverlaps):
+    manualassignments = rprocess.loadassignments(filename)
+    for assignment in manualassignments:
+        matching = [m for m in possibleassign if assignment.netID == m.netID]
+        # if this sup has not been manually assigned
+        if not matching:
+            continue
+        
+        # Removing sup assignment from possibleassign
+        possibleassign.remove(matching[0])
+        possibleassign.append(assignment)
+
+        # Removing cons overlap from consoverlap
+        for cons in matching[0].assignments:
+            co = [c for c in consoverlaps if c.netID == cons]
+            if not co:
+                continue
+            consoverlaps.remove(co[0])
+    
 
 # Initializes the possibleassign list, 
 def initializesups(possibleassign):
@@ -51,11 +73,12 @@ def initializesups(possibleassign):
 # Returns None if ascons does not have any overlapping sups
 # If this finds that a 'popped' sup has the max assignments, it will remove it from the consoverlaps heap
 def selectnextsup(ascons, possibleassign, consoverlaps):
-    # if this cons has no overlaps
-    if len(ascons.assignments) == 0:
-        return None
     while True:
+        # if this cons has no overlaps
+        if not len(ascons.assignments):
+            return None
         nextsup = ascons.assignments.pop()
+        assup = []
         assup = [s for s in possibleassign if s.netID == nextsup]
         sup = assup[0]
         
@@ -73,7 +96,8 @@ def selectnextsup(ascons, possibleassign, consoverlaps):
 # Current implementation is to turn it into a priority queue
 # This way, the consultants with the least amount of overlapping sups are prioritized
 def initializecons(consoverlaps):
-    return heapq.heapify(consoverlaps)
+    # Not returning this, because heapify transforms list to heap in-place
+    heapq.heapify(consoverlaps)
 
 # Gets the next cons to assign a supervisor to
 # Current implementation is to pop it from a priority queue.
@@ -92,8 +116,8 @@ def assigncrs(supreport, consreport):
     possibleassign, consoverlaps = populateoverlapshift(allshifts)
 
     # Turn consoverlaps into a priority queue/heap
-    consoverlaps = initializecons(consoverlaps)
-    possibleassign = initialize(possibleassign)
+    initializecons(consoverlaps)
+    possibleassign = initializesups(possibleassign)
 
     # The suggested CR assignments that will be returned once this function finishes.
     supassignments = list(possibleassign)
@@ -119,6 +143,48 @@ def assigncrs(supreport, consreport):
         # The next supervisor was selected successfully; record the assignment and remove the cons from unassigned cons
         nextsup.addassignment(nextcons.netID)
         unassignedcons.remove(nextcons.netID)
+    return (supassignments, unassignedcons)
+
+# Given a supreport and a LIST of consreports processed by rprocess.processcsv(), assigns CRs by prioritizing location.
+# To use, make sure that you have a report for every location, and then order consreports by order of decreasing priority.
+# For example, if you wanted to prioritize assigning those working at ARC, LSM, RBHS, and BEST (in that order):
+# consreports = [ARCcons.csv, LSMcons.csv, RBHScons.csv, BESTcons.csv]
+def assigncrsbylocation(supreport, consreports):
+    supshifts = rprocess.loadshifts(supreport)
+    supassignments = createshiftassignments(supshifts, maxassignments = 8)
+    unassignedcons = []
+    for location in consreports:
+        consshifts = rprocess.loadshifts(location)
+        # possibleassign is the list of sups that CAN have more consultants scheduled for. Once the sup reaches the max number
+        # of assignments, it's removed from possibleassign.
+        # consoverlaps is just the priority queue (heap) of consultants, sorted by the number of sups they have overlapping shifts with.
+        alloverlaps = populateoverlapshift((supshifts, consshifts))
+        consoverlaps = alloverlaps[1]
+
+        # Populate the unassignedcons list.
+        # As a consultant is assigned a supervisor, they are removed from unassignedcons. However, if a consultant does not
+        # have any overlapping shifts with any sup, their netIDs remain in this list.
+        for c in consoverlaps:
+            if c.netID not in unassignedcons:
+                unassignedcons.append(c.netID)
+
+        # Turn consoverlaps into a priority queue/heap
+        initializecons(consoverlaps)
+
+        # Loop while there are still consultants that have overlapping shifts with sups
+        while len(consoverlaps) > 0:
+            # selectNextCons()
+            nextcons = selectnextcons(consoverlaps)
+            
+            # aka selectNextSup()
+            nextsup = selectnextsup(nextcons, supassignments, consoverlaps)
+
+            if nextsup == None:
+                continue
+            
+            # The next supervisor was selected successfully; record the assignment and remove the cons from unassigned cons
+            nextsup.addassignment(nextcons.netID)
+            unassignedcons.remove(nextcons.netID)
     return (supassignments, unassignedcons)
     
 

@@ -39,9 +39,9 @@ class ShiftAssignment:
     
     # netID = the netID of the assignment to use. 
     # maxassignments = the max number of assignments to allow this ShiftAssignment to have.
-    def __init__(self, netID, maxassignments = 0):
+    def __init__(self, netID, assignments = [], maxassignments = 0):
         self.netID = netID
-        self.assignments = []
+        self.assignments = assignments
         # if maxassignments is 0, then there is no max assignment limit
         self.maxassignments = maxassignments
 
