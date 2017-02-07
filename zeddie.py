@@ -115,6 +115,8 @@ def assigncrs(supreport, consreport):
     # of assignments, it's removed from possibleassign.
     # consoverlaps is just the priority queue (heap) of consultants, sorted by the number of sups they have overlapping shifts with.
     possibleassign, consoverlaps = populateoverlapshift(allshifts)
+    print "Number of consoverlaps: " + str(len(consoverlaps))
+
     unassignedcons = []
     loadsavedassignments('data/manualassign.csv', possibleassign, consoverlaps)
 
